@@ -1,17 +1,15 @@
 import emoji
 from langdetect import detect, DetectorFactory
+import os
 import pandas as pd
 import re
+import sys
 from tqdm import tqdm
 
-emotion_map = {
-    ":: joy": 0,
-    ":: sadness": 1,
-    ":: anger": 2,
-    ":: fear": 3,
-    ":: disgust": 4,
-    ":: surprise": 5,
-}
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.append(project_root)
+
+from utils import EMOJI_TO_EMOTION_MAP
 
 
 # Cleans emotion text
@@ -45,15 +43,18 @@ if __name__ == "__main__":
         for line in f:
             try:
                 _, text, emotion = line.strip().split("\t")
-                labeled_data.append({"text": text, "emotion": emotion_map[emotion]})
+                labeled_data.append(
+                    {"text": text, "emotion": EMOJI_TO_EMOTION_MAP[emotion]}
+                )
             except:
                 continue
+    print("Parsed labeled emotion data")
 
     # Converts emotion data to CSV
     labeled_emotion_data = pd.DataFrame(labeled_data)
 
     # Cleans emotion text
-    tqdm.pandas(desc="Cleaning emotion text")
+    tqdm.pandas(desc="Cleaning emotion data")
     labeled_emotion_data = labeled_emotion_data.progress_apply(
         clean_emotion_text, axis=1
     )
@@ -63,5 +64,6 @@ if __name__ == "__main__":
 
     # Saves processed labeled emotion data
     labeled_emotion_data.to_csv(
-        "../../data/processed/cleaned_labeled_emotion_data.csv", index=False
+        "../../data/processed/cleaned_labeled_emotion_data_temp.csv", index=False
     )
+    print("Saved labeled emotion data")
