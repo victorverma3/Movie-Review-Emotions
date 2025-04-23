@@ -55,7 +55,7 @@ if __name__ == "__main__":
         confusion_matrix_title="TF-IDF Naive Bayes Emotion Confusion Matrix (Validation)",
         confusion_matrix_save_path="../data/naive_bayes/tf_idf/val_nb_emotion_confusion_matrix.png",
     )
-    print("Evaluated TF-IDF NB test predictions")
+    print("Evaluated TF-IDF NB validation predictions")
 
     # Trains Naive Bayes model using Bag of Words
     bow_nb_model = Pipeline([("tfidf", CountVectorizer()), ("nb", MultinomialNB())])
@@ -96,4 +96,4 @@ if __name__ == "__main__":
         confusion_matrix_title="BoW Naive Bayes Emotion Confusion Matrix (Validation)",
         confusion_matrix_save_path="../data/naive_bayes/bow/val_nb_emotion_confusion_matrix.png",
     )
-    print("Evaluated Bow NB test predictions")
+    print("Evaluated Bow NB validation predictions")

@@ -1,5 +1,7 @@
 import json
 import matplotlib.pyplot as plt
+import numpy as np
+import os
 import pandas as pd
 import seaborn as sns
 from sklearn.metrics import (
@@ -7,6 +9,8 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 from typing import Sequence, Tuple
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 EKMAN_EMOTIONS = ["Happiness", "Sadness", "Anger", "Fear", "Disgust", "Surprise"]
 
@@ -53,23 +57,78 @@ def load_emotion_data_splits() -> (
 ):
 
     # Loads train data
-    train_data = pd.read_csv("../data/processed/cleaned_labeled_emotion_data_train.csv")
+    train_data = pd.read_csv(
+        os.path.join(
+            BASE_DIR,
+            "data/processed/cleaned_labeled_emotion_data_train.csv",
+        )
+    )
     x_train = train_data["text"].tolist()
     y_train = train_data["emotion"].tolist()
 
     # Loads test data
-    test_data = pd.read_csv("../data/processed/cleaned_labeled_emotion_data_test.csv")
+    test_data = pd.read_csv(
+        os.path.join(
+            BASE_DIR,
+            "data/processed/cleaned_labeled_emotion_data_test.csv",
+        )
+    )
     x_test = test_data["text"].tolist()
     y_test = test_data["emotion"].tolist()
 
     # Loads validation data
     validation_data = pd.read_csv(
-        "../data/processed/cleaned_labeled_emotion_data_validation.csv"
+        os.path.join(
+            BASE_DIR,
+            "data/processed/cleaned_labeled_emotion_data_validation.csv",
+        )
     )
     x_val = validation_data["text"].tolist()
     y_val = validation_data["emotion"].tolist()
 
+    print("Loaded emotion data")
+
     return x_train, y_train, x_test, y_test, x_val, y_val
+
+
+# Loads emotion data embeddings
+def load_emotion_data_embedings(
+    embedding_model_name: str,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+
+    # Loads x_train embeddings
+    embedded_x_train = np.load(
+        os.path.join(
+            BASE_DIR,
+            "data/neural_network/embeddings",
+            embedding_model_name,
+            "x_train_embeddings.npy",
+        )
+    )
+
+    # Loads x_test embeddings
+    embedded_x_test = np.load(
+        os.path.join(
+            BASE_DIR,
+            "data/neural_network/embeddings",
+            embedding_model_name,
+            "x_test_embeddings.npy",
+        )
+    )
+
+    # Loads x_val embeddings
+    embedded_x_val = np.load(
+        os.path.join(
+            BASE_DIR,
+            "data/neural_network/embeddings",
+            embedding_model_name,
+            "x_val_embeddings.npy",
+        )
+    )
+
+    print("Loaded embeddings")
+
+    return embedded_x_train, embedded_x_test, embedded_x_val
 
 
 # Evaluates the model
