@@ -14,6 +14,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 EKMAN_EMOTIONS = ["Happiness", "Sadness", "Anger", "Fear", "Disgust", "Surprise"]
 
+
 EMOTION_TO_LABEL_MAP = {
     "joy": 0,
     "sadness": 1,
@@ -126,7 +127,7 @@ def load_emotion_data_embedings(
         )
     )
 
-    print("Loaded embeddings")
+    print(f"Loaded {embedding_model_name} embeddings")
 
     return embedded_x_train, embedded_x_test, embedded_x_val
 
