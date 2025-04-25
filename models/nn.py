@@ -13,7 +13,7 @@ from typing import Sequence
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(project_root)
 
-from utils import load_emotion_data_embedings, load_emotion_data_splits, evaluate_model
+from utils import load_emotion_data_embeddings, load_emotion_data_splits, evaluate_model
 
 
 class EkmanEmotionClassifer(nn.Module):
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     _, y_train, _, y_test, _, y_val = load_emotion_data_splits()
 
     # Loads embeddings
-    embedded_x_train, embedded_x_test, embedded_x_val = load_emotion_data_embedings(
+    embedded_x_train, embedded_x_test, embedded_x_val = load_emotion_data_embeddings(
         embedding_model_name=args.embedding_model_name
     )
 

@@ -93,7 +93,7 @@ def load_emotion_data_splits() -> (
 
 
 # Loads emotion data embeddings
-def load_emotion_data_embedings(
+def load_emotion_data_embeddings(
     embedding_model_name: str,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
