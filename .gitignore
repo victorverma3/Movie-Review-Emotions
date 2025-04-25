@@ -2,6 +2,6 @@
 *.csv
 *.DS_Store
 *venv
-/data/neural_network/embeddings
+/data/nn/embeddings
 /data/raw/twitter_emotion_corpus.txt
 sources.txt

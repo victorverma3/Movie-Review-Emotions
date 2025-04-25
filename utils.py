@@ -101,7 +101,7 @@ def load_emotion_data_embedings(
     embedded_x_train = np.load(
         os.path.join(
             BASE_DIR,
-            "data/neural_network/embeddings",
+            "data/nn/embeddings",
             embedding_model_name,
             "x_train_embeddings.npy",
         )
@@ -111,7 +111,7 @@ def load_emotion_data_embedings(
     embedded_x_test = np.load(
         os.path.join(
             BASE_DIR,
-            "data/neural_network/embeddings",
+            "data/nn/embeddings",
             embedding_model_name,
             "x_test_embeddings.npy",
         )
@@ -121,7 +121,7 @@ def load_emotion_data_embedings(
     embedded_x_val = np.load(
         os.path.join(
             BASE_DIR,
-            "data/neural_network/embeddings",
+            "data/nn/embeddings",
             embedding_model_name,
             "x_val_embeddings.npy",
         )

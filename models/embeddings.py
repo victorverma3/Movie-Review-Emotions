@@ -43,7 +43,7 @@ def create_embeddings(
     data_variant: str,
 ) -> None:
 
-    directory = f"../data/neural_network/embeddings/{embedding_model_name}"
+    directory = f"../data/nn/embeddings/{embedding_model_name}"
     if not os.path.exists(directory):
         os.makedirs(directory)
 
@@ -60,7 +60,7 @@ def create_embeddings(
 
     # Saves embeddings
     np.save(
-        file=f"../data/neural_network/embeddings/{embedding_model_name}/{data_variant}_embeddings.npy",
+        file=f"../data/nn/embeddings/{embedding_model_name}/{data_variant}_embeddings.npy",
         arr=embeddings,
     )
     print(f"Created {data_variant} embeddings")
