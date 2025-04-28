@@ -1,7 +1,0 @@
-Base Training Dataset
-lr: 0.05
-momentum: 0.5
-epochs: 100
-batch_size: 64
-----------
-Combined Training Dataset

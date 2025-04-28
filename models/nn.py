@@ -29,12 +29,29 @@ class EkmanEmotionClassifer(nn.Module):
         self.loss_function = nn.CrossEntropyLoss()
         self.optimizer = optim.SGD(self.parameters(), lr=lr, momentum=momentum)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
 
         x = F.relu(self.linear1(x))
         x = self.linear2(x)
 
         return x
+
+    def predict(self, x: np.ndarray[float]) -> np.ndarray[int]:
+
+        # Prepares input tensor
+        x_tensor = torch.tensor(data=x, dtype=torch.float32)
+        dataset = TensorDataset(x_tensor)
+        loader = DataLoader(dataset)
+
+        # Gathers predictions
+        predictions = []
+        with torch.no_grad():
+            for (inputs,) in loader:
+                outputs = self.forward(inputs)
+                _, preds = torch.max(outputs, 1)
+                predictions.extend(preds.cpu().numpy())
+
+        return np.array(predictions)
 
     def train(
         self,
@@ -43,8 +60,7 @@ class EkmanEmotionClassifer(nn.Module):
         num_epochs: int = 100,
         batch_size: int = 64,
         verbose: bool = True,
-        save_model: bool = False,
-    ):
+    ) -> None:
 
         # Prepares training data
         x_tensor = torch.tensor(data=x_train, dtype=torch.float32)
@@ -53,15 +69,13 @@ class EkmanEmotionClassifer(nn.Module):
         trainset = TensorDataset(x_tensor, y_tensor)
         trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
 
+        # Completes training iterations
         if verbose:
             print("----------")
-        # Completes training iterations
         for epoch in range(num_epochs):
             running_loss = 0.0
-            for batch_idx, data in enumerate(trainloader, 0):
-
+            for _, data in enumerate(trainloader, 0):
                 inputs, labels = data
-
                 self.optimizer.zero_grad()
 
                 # Updates model parameters
@@ -74,39 +88,17 @@ class EkmanEmotionClassifer(nn.Module):
                 running_loss += loss.item()
             if verbose:
                 print(f"Epoch {epoch + 1} loss: {running_loss / 10:.3f}")
-        if verbose:
-            print("Finished training Ekman Emotion Classifier")
 
     def evaluate(
         self,
-        x: np.ndarray[float],
-        y: Sequence[int],
+        true: Sequence[int],
+        pred: np.ndarray[int],
         data_variant: str,
         training_dataset: str,
         save_metrics: bool = True,
         create_confusion_matrix: bool = True,
         verbose: bool = True,
     ) -> Tuple[float, float, float, float]:
-
-        # Prepares testing data
-        x_tensor = torch.tensor(data=x, dtype=torch.float32)
-        y_tensor = torch.tensor(data=y, dtype=torch.long)
-
-        testset = TensorDataset(x_tensor, y_tensor)
-        testloader = DataLoader(testset)
-
-        true = []
-        pred = []
-
-        # Evaluates accuracy
-        with torch.no_grad():
-            for data in testloader:
-                inputs, labels = data
-                outputs = self.forward(inputs)
-                _, predictions = torch.max(outputs, 1)
-
-                true.extend(labels.cpu().numpy())
-                pred.extend(predictions.cpu().numpy())
 
         # Evaluates model
         accuracy, precision, recall, f1_score = evaluate_model(
@@ -127,6 +119,11 @@ class EkmanEmotionClassifer(nn.Module):
             print(f"{data_variant.title()} f1 score: {f1_score:.3f}")
 
         return accuracy, precision, recall, f1_score
+
+    def save(self, save_path: str) -> None:
+
+        torch.save(obj=self.state_dict(), f=save_path)
+        print(f"Saved model to {args.save_path}")
 
 
 # Performs grid search over neural network parameters
@@ -167,21 +164,25 @@ def nn_grid_search(
             verbose=False,
         )
 
-        # Evaluates classification model
+        # Evaluates test performance
+        pred_test = model.predict(x=embedded_x_test)
         test_accuracy, test_precision, test_recall, test_f1_score = model.evaluate(
-            x=embedded_x_test,
-            y=y_test,
-            embedding_model_name=args.embedding_model_name,
+            true=y_test,
+            pred=pred_test,
             data_variant="test",
+            training_dataset=training_dataset,
             save_metrics=False,
             create_confusion_matrix=False,
             verbose=False,
         )
+
+        # Evaluates validation performance
+        pred_val = model.predict(x=embedded_x_val)
         val_accuracy, val_precision, val_recall, val_f1_score = model.evaluate(
-            x=embedded_x_val,
-            y=y_val,
-            embedding_model_name=args.embedding_model_name,
+            true=y_val,
+            pred=pred_val,
             data_variant="validation",
+            training_dataset=training_dataset,
             save_metrics=False,
             create_confusion_matrix=False,
             verbose=False,
@@ -205,7 +206,7 @@ def nn_grid_search(
 
         # Saves parameter metrics
         with open(
-            f"./nn_parameters/{training_dataset}/metrics_lr{lr}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json",
+            f"./nn_param_grid_search/{training_dataset}/metrics_lr{lr}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json",
             "w",
         ) as f:
             json.dump(parameter_metrics, f, indent=4)
@@ -216,7 +217,7 @@ def get_best_nn_parameters(
     training_dataset: str,
 ) -> Tuple[float, float, int, int, float]:
 
-    directory = f"./nn_parameters/{training_dataset}"
+    directory = f"./nn_param_grid_search/{training_dataset}"
     grid_search_results = []
 
     # Concatenates grid search results
@@ -230,8 +231,8 @@ def get_best_nn_parameters(
     best_momentum = None
     best_num_epochs = None
     best_batch_size = None
-
     best_f1 = 0
+
     for result in grid_search_results:
         mean_f1 = np.mean([result["test_f1_score"], result["val_f1_score"]])
         if mean_f1 > best_f1:
@@ -263,7 +264,12 @@ if __name__ == "__main__":
         "--training-dataset",
         help="Specifies the training dataset.",
         choices=["base", "combined"],
-        default="base",
+        default="combined",
+    )
+
+    # Save path
+    parser.add_argument(
+        "-sp", "--save_path", help="Defines the model save path.", default=None
     )
 
     args = parser.parse_args()
@@ -280,26 +286,44 @@ if __name__ == "__main__":
         )
 
         # Trains classification model
-        model = EkmanEmotionClassifer(
-            input_dim=len(embedded_x_train[0]), lr=0.05, momentum=0.5
-        )
-        model.train(
-            x_train=embedded_x_train, y_train=y_train, num_epochs=100, batch_size=64
-        )
+        if args.training_dataset == "base":
+            model = EkmanEmotionClassifer(
+                input_dim=len(embedded_x_train[0]), lr=0.05, momentum=0.5
+            )
+            model.train(
+                x_train=embedded_x_train, y_train=y_train, num_epochs=100, batch_size=64
+            )
+        elif args.training_dataset == "combined":
+            model = EkmanEmotionClassifer(
+                input_dim=len(embedded_x_train[0]), lr=0.01, momentum=0.9
+            )
+            model.train(
+                x_train=embedded_x_train, y_train=y_train, num_epochs=100, batch_size=64
+            )
 
-        # Evaluates classification model
+        # Evaluates test performance
+        pred_test = model.predict(x=embedded_x_test)
         model.evaluate(
-            x=embedded_x_test,
-            y=y_test,
+            true=y_test,
+            pred=pred_test,
             data_variant="test",
             training_dataset=args.training_dataset,
         )
+
+        # Evaluates validation performance
+        pred_val = model.predict(x=embedded_x_val)
         model.evaluate(
-            x=embedded_x_val,
-            y=y_val,
+            true=y_val,
+            pred=pred_val,
             data_variant="validation",
             training_dataset=args.training_dataset,
         )
+
+        # Saves model
+        if args.save_path is not None:
+            print("----------")
+            model.save_model(save_path=args.save_path)
+
     elif args.mode == "search":
         # Loads emotion data splits
         _, y_train, _, y_test, _, y_val = load_emotion_data_splits(
