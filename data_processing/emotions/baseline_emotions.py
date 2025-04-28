@@ -31,13 +31,20 @@ if __name__ == "__main__":
     labeled_emotion_data = pd.read_csv(
         "../../data/processed/cleaned_labeled_emotion_data.csv"
     )
+    supplemental_labeled_emotion_data = pd.read_csv(
+        "../../data/processed/cleaned_labeled_emotion_data_supplemental.csv"
+    )
+    combined_labeled_emotion_data = pd.concat(
+        [labeled_emotion_data, supplemental_labeled_emotion_data], ignore_index=True
+    )
+    print("Loaded labeled emotion data")
 
     # Performs baseline predictions
     baseline_model = pipeline(
         "sentiment-analysis", model="arpanghoshal/EkmanClassifier"
     )
     tqdm.pandas(desc="Predicting baseline emotions")
-    predicted_emotion_data = labeled_emotion_data.progress_apply(
+    predicted_emotion_data = combined_labeled_emotion_data.progress_apply(
         predict_baseline_emotion, baseline_model=baseline_model, axis=1
     )
 
@@ -48,14 +55,14 @@ if __name__ == "__main__":
 
     # Saves baseline predictions
     predicted_emotion_data.to_csv(
-        "../../data/baseline/baseline_emotion_predictions.csv", index=False
+        "../../data/baseline/baseline_emotion_predictions_combined.csv", index=False
     )
 
     # Evaluates the model
     evaluate_model(
         actual=predicted_emotion_data["emotion"].tolist(),
         predicted=predicted_emotion_data["predicted_emotion"].tolist(),
-        classification_report_save_path="../../data/baseline/baseline_emotion_classification_report.json",
+        classification_report_save_path="../../data/baseline/baseline_emotion_classification_report_combined.json",
         confusion_matrix_title="Baseline Emotion Confusion Matrix",
-        confusion_matrix_save_path="../../data/baseline/baseline_emotion_confusion_matrix.png",
+        confusion_matrix_save_path="../../data/baseline/baseline_emotion_confusion_matrix_combined.png",
     )
