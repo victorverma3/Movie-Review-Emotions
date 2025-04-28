@@ -1,4 +1,6 @@
 import argparse
+import itertools
+import json
 import numpy as np
 import os
 import sys
@@ -7,7 +9,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
-from typing import Sequence
+from tqdm import tqdm
+from typing import Sequence, Tuple
 
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -17,33 +20,43 @@ from utils import load_emotion_data_embeddings, load_emotion_data_splits, evalua
 
 
 class EkmanEmotionClassifer(nn.Module):
-    def __init__(self, input_dim: int, lr: float = 0.01, momentum: float = 0.9):
+    def __init__(self, input_dim: int = 384, lr: float = 0.05, momentum: float = 0.9):
 
         super().__init__()
-        self.fc1 = nn.Linear(in_features=input_dim, out_features=256)
-        self.fc2 = nn.Linear(in_features=256, out_features=6)
+        self.hidden_size = 256
+        self.linear1 = nn.Linear(in_features=input_dim, out_features=self.hidden_size)
+        self.linear2 = nn.Linear(in_features=self.hidden_size, out_features=6)
         self.loss_function = nn.CrossEntropyLoss()
         self.optimizer = optim.SGD(self.parameters(), lr=lr, momentum=momentum)
 
     def forward(self, x):
 
-        x = F.relu(self.fc1(x))
-        x = self.fc2(x)
+        x = F.relu(self.linear1(x))
+        x = self.linear2(x)
 
         return x
 
-    def train(self, x_train: np.ndarray, y_train: Sequence[int], num_epochs: int = 2):
+    def train(
+        self,
+        x_train: np.ndarray[float],
+        y_train: Sequence[int],
+        num_epochs: int = 100,
+        batch_size: int = 64,
+        verbose: bool = True,
+        save_model: bool = False,
+    ):
 
         # Prepares training data
         x_tensor = torch.tensor(data=x_train, dtype=torch.float32)
         y_tensor = torch.tensor(data=y_train, dtype=torch.long)
 
         trainset = TensorDataset(x_tensor, y_tensor)
-        trainloader = DataLoader(trainset, batch_size=32, shuffle=True)
+        trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
 
+        if verbose:
+            print("----------")
         # Completes training iterations
         for epoch in range(num_epochs):
-
             running_loss = 0.0
             for batch_idx, data in enumerate(trainloader, 0):
 
@@ -59,18 +72,21 @@ class EkmanEmotionClassifer(nn.Module):
 
                 # Updates running loss
                 running_loss += loss.item()
-                # if batch_idx % 100 == 0:
-                #     print(
-                #         f"Epoch {epoch + 1}, batch {batch_idx + 1} loss: {running_loss / 10:.3f}"
-                #     )
-                #     running_loss = 0.0
-            print(f"Epoch {epoch + 1} loss: {running_loss / 10:.3f}")
-
-        print("Finished training Ekman Emotion Classifier")
+            if verbose:
+                print(f"Epoch {epoch + 1} loss: {running_loss / 10:.3f}")
+        if verbose:
+            print("Finished training Ekman Emotion Classifier")
 
     def evaluate(
-        self, x: np.ndarray, y: np.ndarray, embedding_model_name: str, data_variant: str
-    ):
+        self,
+        x: np.ndarray[float],
+        y: Sequence[int],
+        data_variant: str,
+        training_dataset: str,
+        save_metrics: bool = True,
+        create_confusion_matrix: bool = True,
+        verbose: bool = True,
+    ) -> Tuple[float, float, float, float]:
 
         # Prepares testing data
         x_tensor = torch.tensor(data=x, dtype=torch.float32)
@@ -93,54 +109,235 @@ class EkmanEmotionClassifer(nn.Module):
                 pred.extend(predictions.cpu().numpy())
 
         # Evaluates model
-        evaluate_model(
+        accuracy, precision, recall, f1_score = evaluate_model(
             actual=true,
             predicted=pred,
-            classification_report_save_path=f"../data/nn/predictions/{embedding_model_name}/{data_variant}_nn_emotion_classification_report.json",
-            confusion_matrix_title=f"BoW NN Emotion Confusion Matrix ({data_variant.title()})",
-            confusion_matrix_save_path=f"../data/nn/predictions/{embedding_model_name}/{data_variant}_nn_emotion_confusion_matrix.png",
+            classification_report_save_path=f"../data/nn/predictions/{training_dataset}/{data_variant}_nn_emotion_classification_report.json",
+            confusion_matrix_title=f"NN Emotion Confusion Matrix ({data_variant.title()})",
+            confusion_matrix_save_path=f"../data/nn/predictions/{training_dataset}/{data_variant}_nn_emotion_confusion_matrix.png",
+            save_metrics=save_metrics,
+            create_confusion_matrix=create_confusion_matrix,
         )
+
+        if verbose:
+            print("----------")
+            print(f"{data_variant.title()} accuracy: {accuracy:.3f}")
+            print(f"{data_variant.title()} precision: {precision:.3f}")
+            print(f"{data_variant.title()} recall: {recall:.3f}")
+            print(f"{data_variant.title()} f1 score: {f1_score:.3f}")
+
+        return accuracy, precision, recall, f1_score
+
+
+# Performs grid search over neural network parameters
+def nn_grid_search(
+    lr_options: Sequence[float],
+    momentum_options: Sequence[float],
+    num_epochs_options: Sequence[int],
+    batch_size_options: Sequence[int],
+    embedded_x_train: np.ndarray[float],
+    embedded_x_test: np.ndarray[float],
+    embedded_x_val: np.ndarray[float],
+    y_train: Sequence[int],
+    y_test: Sequence[int],
+    y_val: Sequence[int],
+    training_dataset: str,
+) -> None:
+
+    # Performs grid search
+    for lr, momentum, num_epochs, batch_size in tqdm(
+        itertools.product(
+            lr_options, momentum_options, num_epochs_options, batch_size_options
+        ),
+        total=len(lr_options)
+        * len(momentum_options)
+        * len(num_epochs_options)
+        * len(batch_size_options),
+        desc="Performing grid search",
+    ):
+        # Trains classification model
+        model = EkmanEmotionClassifer(
+            input_dim=len(embedded_x_train[0]), lr=lr, momentum=momentum
+        )
+        model.train(
+            x_train=embedded_x_train,
+            y_train=y_train,
+            num_epochs=num_epochs,
+            batch_size=batch_size,
+            verbose=False,
+        )
+
+        # Evaluates classification model
+        test_accuracy, test_precision, test_recall, test_f1_score = model.evaluate(
+            x=embedded_x_test,
+            y=y_test,
+            embedding_model_name=args.embedding_model_name,
+            data_variant="test",
+            save_metrics=False,
+            create_confusion_matrix=False,
+            verbose=False,
+        )
+        val_accuracy, val_precision, val_recall, val_f1_score = model.evaluate(
+            x=embedded_x_val,
+            y=y_val,
+            embedding_model_name=args.embedding_model_name,
+            data_variant="validation",
+            save_metrics=False,
+            create_confusion_matrix=False,
+            verbose=False,
+        )
+
+        # Aggregates metrics
+        parameter_metrics = {
+            "learning_rate": lr,
+            "momentum": momentum,
+            "num_epochs": num_epochs,
+            "batch_size": batch_size,
+            "test_accuracy": test_accuracy,
+            "test_precision": test_precision,
+            "test_recall": test_recall,
+            "test_f1_score": test_f1_score,
+            "val_accuracy": val_accuracy,
+            "val_precision": val_precision,
+            "val_recall": val_recall,
+            "val_f1_score": val_f1_score,
+        }
+
+        # Saves parameter metrics
+        with open(
+            f"./nn_parameters/{training_dataset}/metrics_lr{lr}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json",
+            "w",
+        ) as f:
+            json.dump(parameter_metrics, f, indent=4)
+
+
+# Gets best neural network parameters from grid search results
+def get_best_nn_parameters(
+    training_dataset: str,
+) -> Tuple[float, float, int, int, float]:
+
+    directory = f"./nn_parameters/{training_dataset}"
+    grid_search_results = []
+
+    # Concatenates grid search results
+    for filename in os.listdir(directory):
+        if filename.endswith(".json"):
+            with open(os.path.join(directory, filename), "r", encoding="utf-8") as f:
+                grid_search_results.append(json.load(f))
+
+    # Retrieves best parameters
+    best_lr = None
+    best_momentum = None
+    best_num_epochs = None
+    best_batch_size = None
+
+    best_f1 = 0
+    for result in grid_search_results:
+        mean_f1 = np.mean([result["test_f1_score"], result["val_f1_score"]])
+        if mean_f1 > best_f1:
+            best_f1 = mean_f1
+            best_lr = result["learning_rate"]
+            best_momentum = result["momentum"]
+            best_num_epochs = result["num_epochs"]
+            best_batch_size = result["batch_size"]
+
+    return best_lr, best_momentum, best_num_epochs, best_batch_size, best_f1
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
-    # Embedding model
+    # Mode
     parser.add_argument(
-        "-embed",
-        "--embedding-model-name",
-        help="The vector embedding model.",
-        choices=["bow", "all-MiniLM-L6-v2"],
-        default="all-MiniLM-L6-v2",
+        "-m",
+        "--mode",
+        help="The neural network mode",
+        choices=["train", "search", "retrieve"],
+        default="train",
+    )
+
+    # Training dataset
+    parser.add_argument(
+        "-td",
+        "--training-dataset",
+        help="Specifies the training dataset.",
+        choices=["base", "combined"],
+        default="base",
     )
 
     args = parser.parse_args()
 
-    # Loads emotion data splits
-    _, y_train, _, y_test, _, y_val = load_emotion_data_splits()
+    if args.mode == "train":
+        # Loads emotion data splits
+        _, y_train, _, y_test, _, y_val = load_emotion_data_splits(
+            training_dataset=args.training_dataset
+        )
 
-    # Loads embeddings
-    embedded_x_train, embedded_x_test, embedded_x_val = load_emotion_data_embeddings(
-        embedding_model_name=args.embedding_model_name
-    )
+        # Loads embeddings
+        embedded_x_train, embedded_x_test, embedded_x_val = (
+            load_emotion_data_embeddings(training_dataset=args.training_dataset)
+        )
 
-    # Trains classification model
-    model = EkmanEmotionClassifer(
-        input_dim=len(embedded_x_train[0]), lr=0.05, momentum=0.9
-    )
-    model.train(x_train=embedded_x_train, y_train=y_train, num_epochs=50)
+        # Trains classification model
+        model = EkmanEmotionClassifer(
+            input_dim=len(embedded_x_train[0]), lr=0.05, momentum=0.5
+        )
+        model.train(
+            x_train=embedded_x_train, y_train=y_train, num_epochs=100, batch_size=64
+        )
 
-    # Evaluates classification model
-    model.evaluate(
-        x=embedded_x_test,
-        y=y_test,
-        embedding_model_name=args.embedding_model_name,
-        data_variant="test",
-    )
-    model.evaluate(
-        x=embedded_x_val,
-        y=y_val,
-        embedding_model_name=args.embedding_model_name,
-        data_variant="validation",
-    )
+        # Evaluates classification model
+        model.evaluate(
+            x=embedded_x_test,
+            y=y_test,
+            data_variant="test",
+            training_dataset=args.training_dataset,
+        )
+        model.evaluate(
+            x=embedded_x_val,
+            y=y_val,
+            data_variant="validation",
+            training_dataset=args.training_dataset,
+        )
+    elif args.mode == "search":
+        # Loads emotion data splits
+        _, y_train, _, y_test, _, y_val = load_emotion_data_splits(
+            training_dataset=args.training_dataset
+        )
+
+        # Loads embeddings
+        embedded_x_train, embedded_x_test, embedded_x_val = (
+            load_emotion_data_embeddings(training_dataset=args.training_dataset)
+        )
+
+        # Configures grid search parameter options
+        lr_options = [0.01, 0.05, 0.1, 0.25]
+        momentum_options = [0.5, 0.9]
+        num_epochs_options = [100, 200]
+        batch_size_options = [64, 128, 256]
+
+        # Performs grid search
+        nn_grid_search(
+            lr_options=lr_options,
+            momentum_options=momentum_options,
+            num_epochs_options=num_epochs_options,
+            batch_size_options=batch_size_options,
+            embedded_x_train=embedded_x_train,
+            embedded_x_test=embedded_x_test,
+            embedded_x_val=embedded_x_val,
+            y_train=y_train,
+            y_test=y_test,
+            y_val=y_val,
+            training_dataset=args.training_dataset,
+        )
+    elif args.mode == "retrieve":
+        # Gets best neural network parameters
+        learning_rate, momentum, num_epochs, batch_size, f1 = get_best_nn_parameters(
+            training_dataset=args.training_dataset,
+        )
+        print("Best learning rate:", learning_rate)
+        print("Best momentum:", momentum)
+        print("Best num epochs:", num_epochs)
+        print("Best batch size:", batch_size)
+        print("Best mean of test and validation f1 score:", f1)

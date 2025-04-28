@@ -1,3 +1,4 @@
+import argparse
 import emoji
 from langdetect import detect, DetectorFactory
 import os
@@ -9,7 +10,7 @@ from tqdm import tqdm
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.append(project_root)
 
-from utils import EMOJI_TO_EMOTION_MAP
+from utils import EMOJI_TO_LABEL_MAP, EMOTION_TO_LABEL_MAP
 
 
 # Cleans emotion text
@@ -37,17 +38,43 @@ def clean_emotion_text(row: pd.DataFrame) -> pd.DataFrame:
 
 if __name__ == "__main__":
 
-    # Parses labeled emotion data
-    labeled_data = []
-    with open("../../data/raw/twitter_emotion_corpus.txt") as f:
-        for line in f:
-            try:
-                _, text, emotion = line.strip().split("\t")
-                labeled_data.append(
-                    {"text": text, "emotion": EMOJI_TO_EMOTION_MAP[emotion]}
-                )
-            except:
-                continue
+    parser = argparse.ArgumentParser()
+
+    # Emotions dataset
+    parser.add_argument(
+        "-d",
+        "--dataset",
+        help="The emotions dataset.",
+        choices=["tec", "supplemental"],
+        required=True,
+    )
+
+    args = parser.parse_args()
+
+    if args.dataset == "tec":
+        # Parses labeled emotion data
+        labeled_data = []
+        with open("../../data/raw/twitter_emotion_corpus.txt") as f:
+            for line in f:
+                try:
+                    _, text, emotion = line.strip().split("\t")
+                    labeled_data.append(
+                        {"text": text, "emotion": EMOJI_TO_LABEL_MAP[emotion]}
+                    )
+                except:
+                    continue
+    elif args.dataset == "supplemental":
+        # Parses labeled emotion data
+        labeled_data = []
+        with open("../../data/raw/supplemental_emotion_data.txt") as f:
+            for line in f:
+                try:
+                    text, emotion = line.strip().split(";")
+                    labeled_data.append(
+                        {"text": text, "emotion": EMOTION_TO_LABEL_MAP[emotion]}
+                    )
+                except:
+                    continue
     print("Parsed labeled emotion data")
 
     # Converts emotion data to CSV

@@ -1,7 +1,7 @@
 *__pycache__
-*.csv
 *.DS_Store
 *venv
 /data/nn/embeddings
-/data/raw/twitter_emotion_corpus.txt
+/data/processed/
+/data/raw/
 sources.txt

@@ -33,7 +33,7 @@ LABEL_TO_EMOTION_MAP = {
     5: "surprise",
 }
 
-EMOJI_TO_EMOTION_MAP = {
+EMOJI_TO_LABEL_MAP = {
     ":: joy": 0,
     ":: sadness": 1,
     ":: anger": 2,
@@ -42,7 +42,7 @@ EMOJI_TO_EMOTION_MAP = {
     ":: surprise": 5,
 }
 
-EMOTION_TO_EMOJI_MAP = {
+LABEL_TO_EMOJI_MAP = {
     0: ":: joy",
     1: ":: sadness",
     2: ":: anger",
@@ -53,39 +53,127 @@ EMOTION_TO_EMOJI_MAP = {
 
 
 # Loads train, test, and validation emotion data
-def load_emotion_data_splits() -> (
-    Tuple[Sequence, Sequence, Sequence, Sequence, Sequence, Sequence]
-):
+def load_emotion_data_splits(
+    training_dataset: str = "base",
+) -> Tuple[Sequence, Sequence, Sequence, Sequence, Sequence, Sequence]:
 
-    # Loads train data
-    train_data = pd.read_csv(
-        os.path.join(
-            BASE_DIR,
-            "data/processed/cleaned_labeled_emotion_data_train.csv",
+    if training_dataset == "base":
+        # Loads train data
+        train_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_train.csv",
+            )
         )
-    )
-    x_train = train_data["text"].tolist()
-    y_train = train_data["emotion"].tolist()
+        x_train = train_data["text"].tolist()
+        y_train = train_data["emotion"].tolist()
 
-    # Loads test data
-    test_data = pd.read_csv(
-        os.path.join(
-            BASE_DIR,
-            "data/processed/cleaned_labeled_emotion_data_test.csv",
+        # Loads test data
+        test_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_test.csv",
+            )
         )
-    )
-    x_test = test_data["text"].tolist()
-    y_test = test_data["emotion"].tolist()
+        x_test = test_data["text"].tolist()
+        y_test = test_data["emotion"].tolist()
 
-    # Loads validation data
-    validation_data = pd.read_csv(
-        os.path.join(
-            BASE_DIR,
-            "data/processed/cleaned_labeled_emotion_data_validation.csv",
+        # Loads validation data
+        validation_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_validation.csv",
+            )
         )
-    )
-    x_val = validation_data["text"].tolist()
-    y_val = validation_data["emotion"].tolist()
+        x_val = validation_data["text"].tolist()
+        y_val = validation_data["emotion"].tolist()
+    elif training_dataset == "supplemental":
+        # Loads train data
+        train_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_train_supplemental.csv",
+            )
+        )
+        x_train = train_data["text"].tolist()
+        y_train = train_data["emotion"].tolist()
+
+        # Loads test data
+        test_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_test_supplemental.csv",
+            )
+        )
+        x_test = test_data["text"].tolist()
+        y_test = test_data["emotion"].tolist()
+
+        # Loads validation data
+        validation_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_validation_supplemental.csv",
+            )
+        )
+        x_val = validation_data["text"].tolist()
+        y_val = validation_data["emotion"].tolist()
+    elif training_dataset == "combined":
+        # Loads train data
+        base_train_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_train.csv",
+            )
+        )
+        supplemental_train_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_train_supplemental.csv",
+            )
+        )
+        combined_train_data = pd.concat(
+            [base_train_data, supplemental_train_data], ignore_index=True
+        )
+        x_train = combined_train_data["text"].tolist()
+        y_train = combined_train_data["emotion"].tolist()
+
+        # Loads test data
+        base_test_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_test.csv",
+            )
+        )
+        supplemental_test_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_test_supplemental.csv",
+            )
+        )
+        combined_test_data = pd.concat(
+            [base_test_data, supplemental_test_data], ignore_index=True
+        )
+        x_test = combined_test_data["text"].tolist()
+        y_test = combined_test_data["emotion"].tolist()
+
+        # Loads validation data
+        base_validation_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_validation.csv",
+            )
+        )
+        supplemental_validation_data = pd.read_csv(
+            os.path.join(
+                BASE_DIR,
+                "data/processed/cleaned_labeled_emotion_data_validation_supplemental.csv",
+            )
+        )
+        combined_validation_data = pd.concat(
+            [base_validation_data, supplemental_validation_data], ignore_index=True
+        )
+        x_val = combined_validation_data["text"].tolist()
+        y_val = combined_validation_data["emotion"].tolist()
 
     print("Loaded emotion data")
 
@@ -94,40 +182,65 @@ def load_emotion_data_splits() -> (
 
 # Loads emotion data embeddings
 def load_emotion_data_embeddings(
-    embedding_model_name: str,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    training_dataset: str = "base",
+) -> Tuple[np.ndarray[float], np.ndarray[float], np.ndarray[float]]:
 
-    # Loads x_train embeddings
-    embedded_x_train = np.load(
-        os.path.join(
-            BASE_DIR,
-            "data/nn/embeddings",
-            embedding_model_name,
-            "x_train_embeddings.npy",
+    if training_dataset == "base":
+        # Loads x_train embeddings
+        embedded_x_train = np.load(
+            os.path.join(
+                BASE_DIR,
+                "data/nn/embeddings",
+                "x_train_embeddings.npy",
+            )
         )
-    )
 
-    # Loads x_test embeddings
-    embedded_x_test = np.load(
-        os.path.join(
-            BASE_DIR,
-            "data/nn/embeddings",
-            embedding_model_name,
-            "x_test_embeddings.npy",
+        # Loads x_test embeddings
+        embedded_x_test = np.load(
+            os.path.join(
+                BASE_DIR,
+                "data/nn/embeddings",
+                "x_test_embeddings.npy",
+            )
         )
-    )
 
-    # Loads x_val embeddings
-    embedded_x_val = np.load(
-        os.path.join(
-            BASE_DIR,
-            "data/nn/embeddings",
-            embedding_model_name,
-            "x_val_embeddings.npy",
+        # Loads x_val embeddings
+        embedded_x_val = np.load(
+            os.path.join(
+                BASE_DIR,
+                "data/nn/embeddings",
+                "x_val_embeddings.npy",
+            )
         )
-    )
+    elif training_dataset == "combined":
+        # Loads x_train embeddings
+        embedded_x_train = np.load(
+            os.path.join(
+                BASE_DIR,
+                "data/nn/embeddings",
+                "x_train_combined_embeddings.npy",
+            )
+        )
 
-    print(f"Loaded {embedding_model_name} embeddings")
+        # Loads x_test embeddings
+        embedded_x_test = np.load(
+            os.path.join(
+                BASE_DIR,
+                "data/nn/embeddings",
+                "x_test_combined_embeddings.npy",
+            )
+        )
+
+        # Loads x_val embeddings
+        embedded_x_val = np.load(
+            os.path.join(
+                BASE_DIR,
+                "data/nn/embeddings",
+                "x_val_combined_embeddings.npy",
+            )
+        )
+
+    print(f"Loaded all-MiniLM-L6-v2 embeddings")
 
     return embedded_x_train, embedded_x_test, embedded_x_val
 
@@ -139,7 +252,9 @@ def evaluate_model(
     classification_report_save_path: str,
     confusion_matrix_title: str,
     confusion_matrix_save_path: str,
-):
+    save_metrics: bool = True,
+    create_confusion_matrix: bool = True,
+) -> Tuple[float, float, float, float]:
 
     # Calculates common classification metrics
     metrics = classification_report(
@@ -150,23 +265,34 @@ def evaluate_model(
         output_dict=True,
     )
 
-    with open(classification_report_save_path, "w") as f:
-        json.dump(metrics, f, indent=4)
+    if save_metrics:
+        with open(classification_report_save_path, "w") as f:
+            json.dump(metrics, f, indent=4)
 
-    # Computes the confusion matrix
-    cm = confusion_matrix(y_true=actual, y_pred=predicted, labels=[0, 1, 2, 3, 4, 5])
+    if create_confusion_matrix:
+        # Computes the confusion matrix
+        cm = confusion_matrix(
+            y_true=actual, y_pred=predicted, labels=[0, 1, 2, 3, 4, 5]
+        )
 
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(
-        cm,
-        annot=True,
-        fmt="d",
-        cmap="Blues",
-        xticklabels=EKMAN_EMOTIONS,
-        yticklabels=EKMAN_EMOTIONS,
+        plt.figure(figsize=(8, 6))
+        sns.heatmap(
+            cm,
+            annot=True,
+            fmt="d",
+            cmap="Blues",
+            xticklabels=EKMAN_EMOTIONS,
+            yticklabels=EKMAN_EMOTIONS,
+        )
+        plt.xlabel("Predicted")
+        plt.ylabel("Actual")
+        plt.title(confusion_matrix_title)
+        plt.savefig(confusion_matrix_save_path)
+        plt.close()
+
+    return (
+        metrics["accuracy"],
+        metrics["macro avg"]["precision"],
+        metrics["macro avg"]["recall"],
+        metrics["macro avg"]["f1-score"],
     )
-    plt.xlabel("Predicted")
-    plt.ylabel("Actual")
-    plt.title(confusion_matrix_title)
-    plt.savefig(confusion_matrix_save_path)
-    plt.close()
