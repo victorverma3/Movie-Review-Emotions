@@ -29,8 +29,8 @@ class EkmanEmotionClassifer(nn.Module):
 
         super().__init__()
         self.input_dim = input_dim
-        self.hidden_size = 256
         self.num_classes = 6
+        self.hidden_size = 256
         self.linear1 = nn.Linear(
             in_features=self.input_dim, out_features=self.hidden_size
         )
@@ -149,6 +149,7 @@ def nn_grid_search(
     momentum_options: Sequence[float],
     num_epochs_options: Sequence[int],
     batch_size_options: Sequence[int],
+    embedding_model_name: str,
     embedded_x_train: np.ndarray[float],
     embedded_x_test: np.ndarray[float],
     embedded_x_val: np.ndarray[float],
@@ -171,7 +172,9 @@ def nn_grid_search(
     ):
         # Trains classification model
         model = EkmanEmotionClassifer(
-            input_dim=len(embedded_x_train[0]), lr=lr, momentum=momentum
+            input_dim=len(embedded_x_train[0]),
+            lr=lr,
+            momentum=momentum,
         )
         model.train(
             x_train=embedded_x_train,
@@ -227,7 +230,7 @@ def nn_grid_search(
 
         # Saves parameter metrics
         with open(
-            f"./nn_param_grid_search/{training_dataset}/metrics_lr{lr}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json",
+            f"./nn_param_grid_search/{embedding_model_name}/{training_dataset}/metrics_lr{lr}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json",
             "w",
         ) as f:
             json.dump(parameter_metrics, f, indent=4)
@@ -235,10 +238,11 @@ def nn_grid_search(
 
 # Gets best neural network parameters from grid search results
 def get_best_nn_parameters(
+    embedding_model_name: str,
     training_dataset: str,
 ) -> Tuple[float, float, int, int, float]:
 
-    directory = f"./nn_param_grid_search/{training_dataset}"
+    directory = f"./nn_param_grid_search/{embedding_model_name}/{training_dataset}"
     grid_search_results = []
 
     # Concatenates grid search results
@@ -288,6 +292,15 @@ if __name__ == "__main__":
         default="combined",
     )
 
+    # Embedding model name
+    parser.add_argument(
+        "-e",
+        "--embedding_model_name",
+        help="Specifies the training dataset.",
+        choices=["all-MiniLM-L6-v2", "m3e-base"],
+        default="all-MiniLM-L6-v2",
+    )
+
     # Plot losses
     parser.add_argument(
         "-pl",
@@ -311,24 +324,41 @@ if __name__ == "__main__":
 
         # Loads embeddings
         embedded_x_train, embedded_x_test, embedded_x_val = (
-            load_emotion_data_embeddings(training_dataset=args.training_dataset)
+            load_emotion_data_embeddings(
+                training_dataset=args.training_dataset,
+                embedding_model_name=args.embedding_model_name,
+            )
         )
 
         # Sets training parameters
-        if args.training_dataset == "base":
-            lr = 0.05
-            momentum = 0.5
-            num_epochs = 100
-            batch_size = 64
-        elif args.training_dataset == "combined":
-            lr = 0.01
-            momentum = 0.9
-            num_epochs = 100
-            batch_size = 64
+        if args.embedding_model_name == "all-MiniLM-L6-v2":
+            if args.training_dataset == "base":
+                lr = 0.05
+                momentum = 0.5
+                num_epochs = 100
+                batch_size = 64
+            elif args.training_dataset == "combined":
+                lr = 0.01
+                momentum = 0.9
+                num_epochs = 100
+                batch_size = 64
+        elif args.embedding_model_name == "m3e-base":
+            if args.training_dataset == "base":
+                lr = 0.05
+                momentum = 0.5
+                num_epochs = 100
+                batch_size = 64
+            elif args.training_dataset == "combined":
+                lr = 0.01
+                momentum = 0.5
+                num_epochs = 200
+                batch_size = 256
 
         # Trains classification model
         model = EkmanEmotionClassifer(
-            input_dim=len(embedded_x_train[0]), lr=lr, momentum=momentum
+            input_dim=len(embedded_x_train[0]),
+            lr=lr,
+            momentum=momentum,
         )
         losses = model.train(
             x_train=embedded_x_train,
@@ -379,7 +409,10 @@ if __name__ == "__main__":
 
         # Loads embeddings
         embedded_x_train, embedded_x_test, embedded_x_val = (
-            load_emotion_data_embeddings(training_dataset=args.training_dataset)
+            load_emotion_data_embeddings(
+                training_dataset=args.training_dataset,
+                embedding_model_name=args.embedding_model_name,
+            )
         )
 
         # Configures grid search parameter options
@@ -394,6 +427,7 @@ if __name__ == "__main__":
             momentum_options=momentum_options,
             num_epochs_options=num_epochs_options,
             batch_size_options=batch_size_options,
+            embedding_model_name=args.embedding_model_name,
             embedded_x_train=embedded_x_train,
             embedded_x_test=embedded_x_test,
             embedded_x_val=embedded_x_val,
@@ -405,8 +439,11 @@ if __name__ == "__main__":
     elif args.mode == "retrieve":
         # Gets best neural network parameters
         learning_rate, momentum, num_epochs, batch_size, f1 = get_best_nn_parameters(
+            embedding_model_name=args.embedding_model_name,
             training_dataset=args.training_dataset,
         )
+        print("Embedding model name:", args.embedding_model_name)
+        print("Training dataset:", args.training_dataset)
         print("Best learning rate:", learning_rate)
         print("Best momentum:", momentum)
         print("Best num epochs:", num_epochs)
