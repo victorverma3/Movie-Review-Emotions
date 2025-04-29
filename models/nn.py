@@ -16,16 +16,27 @@ from typing import Sequence, Tuple
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(project_root)
 
-from utils import load_emotion_data_embeddings, load_emotion_data_splits, evaluate_model
+from utils import (
+    load_emotion_data_embeddings,
+    load_emotion_data_splits,
+    evaluate_model,
+    plot_training_losses,
+)
 
 
 class EkmanEmotionClassifer(nn.Module):
     def __init__(self, input_dim: int = 384, lr: float = 0.05, momentum: float = 0.9):
 
         super().__init__()
+        self.input_dim = input_dim
         self.hidden_size = 256
-        self.linear1 = nn.Linear(in_features=input_dim, out_features=self.hidden_size)
-        self.linear2 = nn.Linear(in_features=self.hidden_size, out_features=6)
+        self.num_classes = 6
+        self.linear1 = nn.Linear(
+            in_features=self.input_dim, out_features=self.hidden_size
+        )
+        self.linear2 = nn.Linear(
+            in_features=self.hidden_size, out_features=self.num_classes
+        )
         self.loss_function = nn.CrossEntropyLoss()
         self.optimizer = optim.SGD(self.parameters(), lr=lr, momentum=momentum)
 
@@ -59,8 +70,8 @@ class EkmanEmotionClassifer(nn.Module):
         y_train: Sequence[int],
         num_epochs: int = 100,
         batch_size: int = 64,
-        verbose: bool = True,
-    ) -> None:
+        verbose: bool = False,
+    ) -> Sequence[float]:
 
         # Prepares training data
         x_tensor = torch.tensor(data=x_train, dtype=torch.float32)
@@ -70,9 +81,9 @@ class EkmanEmotionClassifer(nn.Module):
         trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
 
         # Completes training iterations
-        if verbose:
-            print("----------")
-        for epoch in range(num_epochs):
+        print("----------")
+        losses = []
+        for epoch in tqdm(range(num_epochs), desc="Training epochs"):
             running_loss = 0.0
             for _, data in enumerate(trainloader, 0):
                 inputs, labels = data
@@ -86,8 +97,14 @@ class EkmanEmotionClassifer(nn.Module):
 
                 # Updates running loss
                 running_loss += loss.item()
+
+            # Aggregates loss over time
+            losses.append(running_loss)
+
             if verbose:
                 print(f"Epoch {epoch + 1} loss: {running_loss / 10:.3f}")
+
+        return losses
 
     def evaluate(
         self,
@@ -95,6 +112,7 @@ class EkmanEmotionClassifer(nn.Module):
         pred: np.ndarray[int],
         data_variant: str,
         training_dataset: str,
+        prediction_variant: str,
         save_metrics: bool = True,
         create_confusion_matrix: bool = True,
         verbose: bool = True,
@@ -104,9 +122,9 @@ class EkmanEmotionClassifer(nn.Module):
         accuracy, precision, recall, f1_score = evaluate_model(
             actual=true,
             predicted=pred,
-            classification_report_save_path=f"../data/nn/predictions/{training_dataset}/{data_variant}_nn_emotion_classification_report.json",
+            classification_report_save_path=f"../data/nn/{prediction_variant}/{training_dataset}/{data_variant}_nn_emotion_classification_report.json",
             confusion_matrix_title=f"NN Emotion Confusion Matrix ({data_variant.title()})",
-            confusion_matrix_save_path=f"../data/nn/predictions/{training_dataset}/{data_variant}_nn_emotion_confusion_matrix.png",
+            confusion_matrix_save_path=f"../data/nn/{prediction_variant}/{training_dataset}/{data_variant}_nn_emotion_confusion_matrix.png",
             save_metrics=save_metrics,
             create_confusion_matrix=create_confusion_matrix,
         )
@@ -171,6 +189,7 @@ def nn_grid_search(
             pred=pred_test,
             data_variant="test",
             training_dataset=training_dataset,
+            prediction_variant="prediction",
             save_metrics=False,
             create_confusion_matrix=False,
             verbose=False,
@@ -183,6 +202,7 @@ def nn_grid_search(
             pred=pred_val,
             data_variant="validation",
             training_dataset=training_dataset,
+            prediction_variant="prediction",
             save_metrics=False,
             create_confusion_matrix=False,
             verbose=False,
@@ -267,6 +287,14 @@ if __name__ == "__main__":
         default="combined",
     )
 
+    # Plot losses
+    parser.add_argument(
+        "-pl",
+        "--plot_losses",
+        help="Specifies if the training losses should be plotted.",
+        action="store_true",
+    )
+
     # Save path
     parser.add_argument(
         "-sp", "--save_path", help="Defines the model save path.", default=None
@@ -285,20 +313,34 @@ if __name__ == "__main__":
             load_emotion_data_embeddings(training_dataset=args.training_dataset)
         )
 
-        # Trains classification model
+        # Sets training parameters
         if args.training_dataset == "base":
-            model = EkmanEmotionClassifer(
-                input_dim=len(embedded_x_train[0]), lr=0.05, momentum=0.5
-            )
-            model.train(
-                x_train=embedded_x_train, y_train=y_train, num_epochs=100, batch_size=64
-            )
+            lr = 0.05
+            momentum = 0.5
+            num_epochs = 100
+            batch_size = 64
         elif args.training_dataset == "combined":
-            model = EkmanEmotionClassifer(
-                input_dim=len(embedded_x_train[0]), lr=0.01, momentum=0.9
-            )
-            model.train(
-                x_train=embedded_x_train, y_train=y_train, num_epochs=100, batch_size=64
+            lr = 0.01
+            momentum = 0.9
+            num_epochs = 100
+            batch_size = 64
+
+        # Trains classification model
+        model = EkmanEmotionClassifer(
+            input_dim=len(embedded_x_train[0]), lr=lr, momentum=momentum
+        )
+        losses = model.train(
+            x_train=embedded_x_train,
+            y_train=y_train,
+            num_epochs=num_epochs,
+            batch_size=batch_size,
+        )
+
+        # Plots losses
+        if args.plot_losses:
+            plot_training_losses(
+                losses=losses,
+                save_path=f"../data/nn/figures/{args.training_dataset}_training_loss.png",
             )
 
         # Evaluates test performance
@@ -308,6 +350,7 @@ if __name__ == "__main__":
             pred=pred_test,
             data_variant="test",
             training_dataset=args.training_dataset,
+            prediction_variant="prediction",
         )
 
         # Evaluates validation performance
@@ -317,12 +360,13 @@ if __name__ == "__main__":
             pred=pred_val,
             data_variant="validation",
             training_dataset=args.training_dataset,
+            prediction_variant="prediction",
         )
 
         # Saves model
         if args.save_path is not None:
             print("----------")
-            model.save_model(save_path=args.save_path)
+            model.save(save_path=args.save_path)
 
     elif args.mode == "search":
         # Loads emotion data splits

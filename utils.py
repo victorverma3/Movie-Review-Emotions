@@ -296,3 +296,17 @@ def evaluate_model(
         metrics["macro avg"]["recall"],
         metrics["macro avg"]["f1-score"],
     )
+
+
+# Plots training losses
+def plot_training_losses(losses: Sequence[float], save_path: str) -> None:
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(range(len(losses)), losses, marker="o", linestyle="-")
+    plt.xlabel("Epoch")
+    plt.ylabel("Log Loss")
+    plt.title("Training Loss over Time")
+    plt.grid(True)
+    plt.savefig(save_path)
+
+    print(f"Saved training loss plot to {save_path}")
