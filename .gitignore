@@ -5,5 +5,6 @@
 /data/nn/figures
 /data/processed
 /data/nn/predictions
+/data/output
 /data/raw
 sources.txt
