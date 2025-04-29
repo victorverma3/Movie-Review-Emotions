@@ -21,7 +21,6 @@ if __name__ == "__main__":
 
     # Basic data statistics
     print(f"\n{labeled_emotions_train.head()}")
-    print(f"\n{labeled_emotions_train.describe()}")
     print("\nNumber of labeled emotion training samples:", len(labeled_emotions_train))
 
     # Emotion distribution
@@ -36,7 +35,6 @@ if __name__ == "__main__":
 
     # Basic data statistics
     print(supplemental_labeled_emotions.head())
-    print(f"\n{supplemental_labeled_emotions.describe()}")
     print(
         "\nNumber of supplemental labeled emotion samples:",
         len(supplemental_labeled_emotions),
@@ -69,9 +67,8 @@ if __name__ == "__main__":
 
     # Basic data statistics
     print(combined_labeled_emotions.head())
-    print(f"\n{combined_labeled_emotions.describe()}")
     print(
-        "\nNumber of supplemental labeled emotion samples:",
+        "\nNumber of combined labeled emotion samples:",
         len(combined_labeled_emotions),
     )
 
@@ -92,7 +89,7 @@ if __name__ == "__main__":
     # Basic data statistics
     print(f"\n{combined_labeled_emotions_train.head()}")
     print(
-        "\nNumber of supplemental labeled emotion training samples:",
+        "\nNumber of combined labeled emotion training samples:",
         len(combined_labeled_emotions_train),
     )
 
