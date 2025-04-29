@@ -2,6 +2,8 @@
 *.DS_Store
 *venv
 /data/nn/embeddings
-/data/processed/
-/data/raw/
+/data/nn/figures
+/data/processed
+/data/nn/predictions
+/data/raw
 sources.txt
