@@ -14,7 +14,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 EKMAN_EMOTIONS = ["Happiness", "Sadness", "Anger", "Fear", "Disgust", "Surprise"]
 
-
 EMOTION_TO_LABEL_MAP = {
     "joy": 0,
     "sadness": 1,

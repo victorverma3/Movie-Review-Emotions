@@ -57,7 +57,7 @@ class EkmanEmotionClassifer(nn.Module):
         # Gathers predictions
         predictions = []
         with torch.no_grad():
-            for (inputs,) in loader:
+            for (inputs,) in tqdm(loader, desc="Predicting emotions"):
                 outputs = self.forward(inputs)
                 _, preds = torch.max(outputs, 1)
                 predictions.extend(preds.cpu().numpy())
