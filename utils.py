@@ -268,6 +268,7 @@ def evaluate_model(
     if save_metrics:
         with open(classification_report_save_path, "w") as f:
             json.dump(metrics, f, indent=4)
+        print(f"Saved classification report to {classification_report_save_path}")
 
     if create_confusion_matrix:
         # Computes the confusion matrix
@@ -288,6 +289,7 @@ def evaluate_model(
         plt.ylabel("Actual")
         plt.title(confusion_matrix_title)
         plt.savefig(confusion_matrix_save_path)
+        print(f"Saved confusion matrix to {confusion_matrix_save_path}")
         plt.close()
 
     return (
@@ -308,5 +310,6 @@ def plot_training_losses(losses: Sequence[float], save_path: str) -> None:
     plt.title("Training Loss over Time")
     plt.grid(True)
     plt.savefig(save_path)
+    plt.close()
 
     print(f"Saved training loss plot to {save_path}")

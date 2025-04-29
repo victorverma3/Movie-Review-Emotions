@@ -122,15 +122,14 @@ class EkmanEmotionClassifer(nn.Module):
         accuracy, precision, recall, f1_score = evaluate_model(
             actual=true,
             predicted=pred,
-            classification_report_save_path=f"../data/nn/{prediction_variant}/{training_dataset}/{data_variant}_nn_emotion_classification_report.json",
+            classification_report_save_path=f"../data/nn/{prediction_variant}/{training_dataset}/{data_variant}_nn_emotion_classification_report_{training_dataset}.json",
             confusion_matrix_title=f"NN Emotion Confusion Matrix ({data_variant.title()})",
-            confusion_matrix_save_path=f"../data/nn/{prediction_variant}/{training_dataset}/{data_variant}_nn_emotion_confusion_matrix.png",
+            confusion_matrix_save_path=f"../data/nn/{prediction_variant}/{training_dataset}/{data_variant}_nn_emotion_confusion_matrix_{training_dataset}.png",
             save_metrics=save_metrics,
             create_confusion_matrix=create_confusion_matrix,
         )
 
         if verbose:
-            print("----------")
             print(f"{data_variant.title()} accuracy: {accuracy:.3f}")
             print(f"{data_variant.title()} precision: {precision:.3f}")
             print(f"{data_variant.title()} recall: {recall:.3f}")
@@ -183,26 +182,28 @@ def nn_grid_search(
         )
 
         # Evaluates test performance
+        print("----------")
         pred_test = model.predict(x=embedded_x_test)
         test_accuracy, test_precision, test_recall, test_f1_score = model.evaluate(
             true=y_test,
             pred=pred_test,
             data_variant="test",
             training_dataset=training_dataset,
-            prediction_variant="prediction",
+            prediction_variant="predictions",
             save_metrics=False,
             create_confusion_matrix=False,
             verbose=False,
         )
 
         # Evaluates validation performance
+        print("----------")
         pred_val = model.predict(x=embedded_x_val)
         val_accuracy, val_precision, val_recall, val_f1_score = model.evaluate(
             true=y_val,
             pred=pred_val,
             data_variant="validation",
             training_dataset=training_dataset,
-            prediction_variant="prediction",
+            prediction_variant="predictions",
             save_metrics=False,
             create_confusion_matrix=False,
             verbose=False,
@@ -344,23 +345,25 @@ if __name__ == "__main__":
             )
 
         # Evaluates test performance
+        print("----------")
         pred_test = model.predict(x=embedded_x_test)
         model.evaluate(
             true=y_test,
             pred=pred_test,
             data_variant="test",
             training_dataset=args.training_dataset,
-            prediction_variant="prediction",
+            prediction_variant="predictions",
         )
 
         # Evaluates validation performance
+        print("----------")
         pred_val = model.predict(x=embedded_x_val)
         model.evaluate(
             true=y_val,
             pred=pred_val,
             data_variant="validation",
             training_dataset=args.training_dataset,
-            prediction_variant="prediction",
+            prediction_variant="predictions",
         )
 
         # Saves model
