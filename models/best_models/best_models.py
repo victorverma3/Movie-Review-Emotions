@@ -22,6 +22,15 @@ if __name__ == "__main__":
         default="combined",
     )
 
+    # Embedding model name
+    parser.add_argument(
+        "-e",
+        "--embedding_model_name",
+        help="Specifies the training dataset.",
+        choices=["all-MiniLM-L6-v2", "m3e-base"],
+        default="all-MiniLM-L6-v2",
+    )
+
     # Save path
     parser.add_argument(
         "-sp",
@@ -44,7 +53,8 @@ if __name__ == "__main__":
 
     # Loads embeddings
     _, embedded_x_test, embedded_x_val = load_emotion_data_embeddings(
-        training_dataset=args.training_dataset
+        training_dataset=args.training_dataset,
+        embedding_model_name=args.embedding_model_name,
     )
 
     # Evaluates test performance

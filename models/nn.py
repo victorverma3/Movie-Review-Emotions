@@ -344,10 +344,10 @@ if __name__ == "__main__":
                 batch_size = 64
         elif args.embedding_model_name == "m3e-base":
             if args.training_dataset == "base":
-                lr = 0.05
+                lr = 0.01
                 momentum = 0.5
                 num_epochs = 100
-                batch_size = 64
+                batch_size = 128
             elif args.training_dataset == "combined":
                 lr = 0.01
                 momentum = 0.5

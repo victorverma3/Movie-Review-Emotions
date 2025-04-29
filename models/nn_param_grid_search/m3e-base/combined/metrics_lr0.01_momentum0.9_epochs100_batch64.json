@@ -1,0 +1,14 @@
+{
+    "learning_rate": 0.01,
+    "momentum": 0.9,
+    "num_epochs": 100,
+    "batch_size": 64,
+    "test_accuracy": 0.5690254159809838,
+    "test_precision": 0.48408595920915104,
+    "test_recall": 0.4665248471638192,
+    "test_f1_score": 0.4719183922142554,
+    "val_accuracy": 0.5826325411334552,
+    "val_precision": 0.4988766767141559,
+    "val_recall": 0.48610976817459167,
+    "val_f1_score": 0.4901455516507766
+}

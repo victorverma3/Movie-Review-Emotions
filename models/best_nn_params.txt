@@ -1,11 +1,33 @@
+These are the best configuration parameters for the Ekman Emotion Classifier (EEC) for each embedding model. The mean f1 score refers to the average of the test f1 score and the validation f1 score.
+
+all-MiniLM-L6-v2 Embedding Model
+----------
 Base Training Dataset
 learning rate: 0.05
 momentum: 0.5
 epochs: 100
 batch size: 64
+mean f1 score: 0.529
 ----------
 Combined Training Dataset
 learning rate: 0.01
 momentum: 0.9
 epochs: 100
 batch size: 64
+mean f1 score: 0.563
+
+m3e-base Embedding Model
+----------
+Base Training Dataset
+learning rate: 0.01
+momentum: 0.5
+epochs: 100
+batch size: 128
+mean f1 score: 0.467
+----------
+Combined Training Dataset
+learning rate: 0.01
+momentum: 0.5
+num epochs: 200
+batch size: 256
+mean f1 score: 0.503
