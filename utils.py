@@ -305,8 +305,9 @@ def plot_training_losses(losses: Sequence[float], save_path: str) -> None:
 
     plt.figure(figsize=(8, 6))
     plt.plot(range(len(losses)), losses, marker="o", linestyle="-")
+    plt.yscale("log")
     plt.xlabel("Epoch")
-    plt.ylabel("Log Loss")
+    plt.ylabel("Training Loss")
     plt.title("Training Loss over Time")
     plt.grid(True)
     plt.savefig(save_path)

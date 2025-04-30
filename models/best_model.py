@@ -36,8 +36,7 @@ if __name__ == "__main__":
         "-sp",
         "--save_path",
         help="Defines the model save path.",
-        default=None,
-        required=True,
+        default="./best_eec_model.pth",
     )
 
     args = parser.parse_args()
