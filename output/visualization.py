@@ -34,7 +34,56 @@ def plot_emotions_by_release_decade(df: pd.DataFrame) -> None:
     plt.savefig("../data/output/figures/emotion_counts_by_release_decade.png")
 
 
-# plots average likes per emotion
+# Plots emotion count by country
+def plot_emotions_by_country(df: pd.DataFrame) -> None:
+
+    # Groups by country of origin
+    emotion_counts = (
+        df.groupby(["country_of_origin", "predicted_emotion"])
+        .size()
+        .reset_index(name="count")
+    )
+    pivot_df = emotion_counts.pivot(
+        index="country_of_origin", columns="predicted_emotion", values="count"
+    ).fillna(0)
+
+    # Creates plot
+    pivot_df.plot(kind="barh", stacked=True, figsize=(8, 6))
+    plt.title("Emotion Counts by Country of Origin")
+    plt.xlabel("Review Count")
+    plt.ylabel("Country of Origin")
+    plt.xticks(rotation=45)
+    plt.legend(title="Predicted Emotion")
+    plt.tight_layout()
+    plt.savefig("../data/output/figures/emotion_counts_by_country.png")
+
+
+# Plots emotion count by genre
+def plot_emotions_by_genre(df: pd.DataFrame) -> None:
+
+    # Converts genres column to list
+    if isinstance(df["genres"].iloc[0], str):
+        df["genres"] = df["genres"].apply(eval)
+    exploded_df = df.explode("genres")
+
+    # Groups by genre and emotion
+    emotion_counts = (
+        exploded_df.groupby(["genres", "predicted_emotion"])
+        .size()
+        .unstack(fill_value=0)
+    )
+
+    # Plot the bar chart
+    emotion_counts.plot(kind="barh", stacked=True, figsize=(10, 12))
+    plt.title("Emotion Counts by Genre", fontsize=14)
+    plt.xlabel("Review Count", fontsize=12)
+    plt.ylabel("Genre", fontsize=12)
+    plt.legend(title="Predicted Emotion")
+    plt.tight_layout()
+    plt.savefig("../data/output/figures/emotion_counts_by_genre.png")
+
+
+# Plots average likes per emotion
 def plot_average_likes_per_emotion(df: pd.DataFrame) -> None:
 
     # Calculates average likes
@@ -42,7 +91,7 @@ def plot_average_likes_per_emotion(df: pd.DataFrame) -> None:
         df.groupby("predicted_emotion")["num_likes"].mean().sort_values(ascending=False)
     )
 
-    # Plot
+    # Creates plot
     plt.figure(figsize=(8, 6))
     plt.bar(avg_likes.index, avg_likes.values)
     plt.xlabel("Emotion")
@@ -57,6 +106,7 @@ if __name__ == "__main__":
     # Loads movie review emotion predictions
     output_movie_df = pd.read_csv("../data/output/predicted_movie_review_emotions.csv")
 
+    # Prints raw emotion counts
     print(output_movie_df["predicted_emotion"].value_counts())
 
     # Gets movie data
@@ -72,4 +122,6 @@ if __name__ == "__main__":
 
     # Creates plots
     plot_emotions_by_release_decade(df=movie_df)
+    plot_emotions_by_country(df=movie_df)
     plot_average_likes_per_emotion(df=movie_df)
+    plot_emotions_by_genre(df=movie_df)
