@@ -26,12 +26,30 @@ def plot_emotions_by_release_decade(df: pd.DataFrame) -> None:
     # Creates plot
     pivot_df.plot(kind="barh", stacked=True, figsize=(8, 6))
     plt.title("Emotion Counts by Release Decade")
-    plt.xlabel("Count")
+    plt.xlabel("Review Count")
     plt.ylabel("Release Decade")
     plt.xticks(rotation=45)
     plt.legend(title="Predicted Emotion")
     plt.tight_layout()
     plt.savefig("./figures/emotion_counts_by_release_decade.png")
+
+
+# plots average likes per emotion
+def plot_average_likes_per_emotion(df: pd.DataFrame) -> None:
+
+    # Calculates average likes
+    avg_likes = (
+        df.groupby("predicted_emotion")["num_likes"].mean().sort_values(ascending=False)
+    )
+
+    # Plot
+    plt.figure(figsize=(8, 6))
+    plt.bar(avg_likes.index, avg_likes.values)
+    plt.xlabel("Emotion")
+    plt.ylabel("Average Number of Likes")
+    plt.title("Average Review Likes per Emotion")
+    plt.tight_layout()
+    plt.savefig("./figures/average_likes_per_emotion.png")
 
 
 if __name__ == "__main__":
@@ -54,3 +72,4 @@ if __name__ == "__main__":
 
     # Creates plots
     plot_emotions_by_release_decade(df=movie_df)
+    plot_average_likes_per_emotion(df=movie_df)
