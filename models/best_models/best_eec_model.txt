@@ -1,0 +1,9 @@
+The best classification model has the following configurations.
+
+all-MiniLM-L6-v2 Embedding Model
+Combined Training Dataset
+learning rate: 0.01
+momentum: 0.9
+epochs: 100
+batch size: 64
+mean f1 score: 0.563
