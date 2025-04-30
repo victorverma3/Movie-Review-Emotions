@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     # Loads classification model
     model = EkmanEmotionClassifer()
-    model.load_state_dict(state_dict=torch.load("./best_nn_combined.pth"))
+    model.load_state_dict(state_dict=torch.load("../models/best_eec_model.pth"))
 
     # Classifies movie review emotions
     predictions = model.predict(movie_review_embeddings)
@@ -58,4 +58,4 @@ if __name__ == "__main__":
     # Saves predictions
     save_path = "../data/output/predicted_movie_review_emotions.csv"
     movie_review_df.to_csv(save_path, index=False)
-    print(f"Saved emotion predictions to {save_path}")
+    print(f"Saved movie review emotion predictions to {save_path}")
