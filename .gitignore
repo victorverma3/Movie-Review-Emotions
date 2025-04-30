@@ -5,5 +5,6 @@
 /data/nn/figures
 /data/processed
 /data/nn/predictions
-/data/output
+/data/output/embeddings
+/data/output/predicted_movie_review_emotions.csv
 /data/raw

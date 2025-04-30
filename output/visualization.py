@@ -31,7 +31,7 @@ def plot_emotions_by_release_decade(df: pd.DataFrame) -> None:
     plt.xticks(rotation=45)
     plt.legend(title="Predicted Emotion")
     plt.tight_layout()
-    plt.savefig("./figures/emotion_counts_by_release_decade.png")
+    plt.savefig("../data/output/figures/emotion_counts_by_release_decade.png")
 
 
 # plots average likes per emotion
@@ -49,7 +49,7 @@ def plot_average_likes_per_emotion(df: pd.DataFrame) -> None:
     plt.ylabel("Average Number of Likes")
     plt.title("Average Review Likes per Emotion")
     plt.tight_layout()
-    plt.savefig("./figures/average_likes_per_emotion.png")
+    plt.savefig("../data/output/figures/average_likes_per_emotion.png")
 
 
 if __name__ == "__main__":
