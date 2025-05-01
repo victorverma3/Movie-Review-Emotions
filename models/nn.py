@@ -236,40 +236,6 @@ def nn_grid_search(
             json.dump(parameter_metrics, f, indent=4)
 
 
-# Gets best neural network parameters from grid search results
-def get_best_nn_parameters(
-    embedding_model_name: str,
-    training_dataset: str,
-) -> Tuple[float, float, int, int, float]:
-
-    directory = f"./nn_param_grid_search/{embedding_model_name}/{training_dataset}"
-    grid_search_results = []
-
-    # Concatenates grid search results
-    for filename in os.listdir(directory):
-        if filename.endswith(".json"):
-            with open(os.path.join(directory, filename), "r", encoding="utf-8") as f:
-                grid_search_results.append(json.load(f))
-
-    # Retrieves best parameters
-    best_lr = None
-    best_momentum = None
-    best_num_epochs = None
-    best_batch_size = None
-    best_f1 = 0
-
-    for result in grid_search_results:
-        mean_f1 = np.mean([result["test_f1_score"], result["val_f1_score"]])
-        if mean_f1 > best_f1:
-            best_f1 = mean_f1
-            best_lr = result["learning_rate"]
-            best_momentum = result["momentum"]
-            best_num_epochs = result["num_epochs"]
-            best_batch_size = result["batch_size"]
-
-    return best_lr, best_momentum, best_num_epochs, best_batch_size, best_f1
-
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -279,7 +245,7 @@ if __name__ == "__main__":
         "-m",
         "--mode",
         help="The neural network mode",
-        choices=["train", "search", "retrieve"],
+        choices=["train", "search"],
         default="train",
     )
 
@@ -436,16 +402,3 @@ if __name__ == "__main__":
             y_val=y_val,
             training_dataset=args.training_dataset,
         )
-    elif args.mode == "retrieve":
-        # Gets best neural network parameters
-        learning_rate, momentum, num_epochs, batch_size, f1 = get_best_nn_parameters(
-            embedding_model_name=args.embedding_model_name,
-            training_dataset=args.training_dataset,
-        )
-        print("Embedding model name:", args.embedding_model_name)
-        print("Training dataset:", args.training_dataset)
-        print("Best learning rate:", learning_rate)
-        print("Best momentum:", momentum)
-        print("Best num epochs:", num_epochs)
-        print("Best batch size:", batch_size)
-        print("Best mean of test and validation f1 score:", f1)
