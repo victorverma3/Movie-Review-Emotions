@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.5)  1 MAY 2025 23:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.5)  2 MAY 2025 00:54
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -819,7 +819,7 @@ Here is how much of TeX's memory you used:
 </usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/lo
 cal/texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texliv
 e/2024/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on poster.pdf (1 page, 200778 bytes).
+Output written on poster.pdf (1 page, 200775 bytes).
 PDF statistics:
  50 PDF objects out of 1000 (max. 8388607)
  30 compressed objects within 1 object stream
