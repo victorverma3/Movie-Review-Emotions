@@ -1,4 +1,4 @@
-# Analyzing Emotions in Reviews for Top-Rated Movies on Letterboxd
+# Emotion Patterns in Reviews for Top-Rated Movies on Letterboxd
 
 ## Table of Contents
 
