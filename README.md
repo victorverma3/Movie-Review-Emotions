@@ -197,10 +197,10 @@ The following python files were used to develop the custom classification model:
 -   `models/nn.py`
 -   `utils.py`
 
-### Emotional Analysis
+### Emotion Patterns
 
-The following python files were used to analyze the emotions expressed in the
-movie reviews:
+The following python files were used to find patterns in the emotions expressed
+in the movie reviews:
 
 -   `data_processing/scrape_movie_data.py`
 -   `output/inference.py`
