@@ -117,17 +117,17 @@ models
 |__ nn_param_grid_search
     |__ all-MiniLM-L6-v2
         |__ base
-            |__ metrics_lr{learning_rate}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json
+            |__ metrics_lr{lr}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json
             |__ ...
         |__ combined
-            |__ metrics_lr{learning_rate}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json
+            |__ metrics_lr{lr}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json
             |__ ...
     |__ m3e-base
         |__ base
-            |__ metrics_lr{learning_rate}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json
+            |__ metrics_lr{lr}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json
             |__ ...
         |__ combined
-            |__ metrics_lr{learning_rate}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json
+            |__ metrics_lr{lr}_momentum{momentum}_epochs{num_epochs}_batch{batch_size}.json
             |__ ...
 |__ best_eec_model.pth
 |__ best_model.py
