@@ -113,6 +113,19 @@ data_processing
     |__ scrape_reviews.py
     |__ ublockoriginlite.crx
 |__ scrape_movie_data.py
+deliverables
+|__ baseline
+    |__ baseline.pdf
+    |__ ...
+|__ paper
+    |__ paper.pdf
+    |__ ...
+|__ poster
+    |__ poster.pdf
+    |__ ...
+|__ proposal
+    |__ proposal.pdf
+    |__ ...
 models
 |__ nn_param_grid_search
     |__ all-MiniLM-L6-v2
@@ -138,14 +151,9 @@ models
 output
 |__ inference.py
 |__ visualization.py
-writeups
-|__ baseline
-    |__ ...
-|__ paper
-    |__ ...
-|__ proposal
-    |__ ...
 .gitignore
+paper.pdf
+poster.pdf
 README.md
 requirements.txt
 utils.py
@@ -191,7 +199,7 @@ The following python files were used to develop the custom classification model:
 
 ### Emotional Analysis
 
-The followiing python files were used to analyze the emotions expressed in the
+The following python files were used to analyze the emotions expressed in the
 movie reviews:
 
 -   `data_processing/scrape_movie_data.py`

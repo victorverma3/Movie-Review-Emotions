@@ -1,0 +1,76 @@
+\begin{thebibliography}{11}
+\providecommand{\natexlab}[1]{#1}
+
+\bibitem[{Imb()}]{Imbalanced}
+
+\newblock Datasets: Imbalanced datasets.
+\newblock
+  \url{https://developers.google.com/machine-learning/crash-course/overfitting/imbalanced-datasets}.
+\newblock Accessed: 2025-04-26.
+
+\bibitem[{Neu(2024)}]{NeuroLaunch}
+ 2024.
+\newblock Paul ekman’s basic emotions: Decoding universal facial expressions.
+\newblock \url{https://neurolaunch.com/paul-ekman-basic-emotions/}.
+\newblock Accessed: 2025-02-24.
+
+\bibitem[{all(2025)}]{all-MiniLM-L6-v2}
+ 2025.
+\newblock all-minilm-l6-v2.
+\newblock \url{https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2}.
+\newblock Accessed: 2025-04-25.
+
+\bibitem[{Demszky et~al.(2020)Demszky, Movshovitz-Attias, Ko, Cowen, Nemade,
+  and Ravi}]{demszky2020goemotions}
+Dorottya Demszky, Dana Movshovitz-Attias, Jeongwoo Ko, Alan Cowen, Gaurav
+  Nemade, and Sujith Ravi. 2020.
+\newblock {GoEmotions: A Dataset of Fine-Grained Emotions}.
+\newblock In \emph{58th Annual Meeting of the Association for Computational
+  Linguistics (ACL)}.
+
+\bibitem[{Ghoshal()}]{Ghoshal2}
+Arpan Ghoshal.
+\newblock Ekman classifier.
+\newblock \url{https://www.promptlayer.com/models/ekmanclassifier}.
+\newblock Accessed: 2025-04-25.
+
+\bibitem[{Ghoshal(2022)}]{Ghoshal}
+Arpan Ghoshal. 2022.
+\newblock Ekmanclassifer.
+\newblock \url{https://huggingface.co/arpanghoshal/EkmanClassifier}.
+\newblock Accessed: 2025-04-25.
+
+\bibitem[{Mohammad()}]{Mohammad}
+Saif Mohammad.
+\newblock Metacorpus.
+\newblock
+  \url{https://socialmediaie.github.io/MetaCorpus/#:~:text=Hashtag%20Emotion%20Corpus%20(aka%20Twitter%20Emotion%20Corpus,%20or%20TEC)}.
+\newblock Accessed: 2025-02-24.
+
+\bibitem[{Mohammad(2012)}]{mohammad-2012-emotional}
+Saif Mohammad. 2012.
+\newblock \href {https://aclanthology.org/S12-1033/} {{\#}emotional tweets}.
+\newblock In \emph{*{SEM} 2012: The First Joint Conference on Lexical and
+  Computational Semantics {--} Volume 1: Proceedings of the main conference and
+  the shared task, and Volume 2: Proceedings of the Sixth International
+  Workshop on Semantic Evaluation ({S}em{E}val 2012)}, pages 246--255,
+  Montr{\'e}al, Canada. Association for Computational Linguistics.
+
+\bibitem[{Valente(2022)}]{Valente}
+Andrea Valente. 2022.
+\newblock Sentiment analysis on ekman's six basic emotions corpus.
+\newblock \url{https://github.com/Valendrew/ekman-emotion-detection}.
+\newblock Accessed: 2025-04-28.
+
+\bibitem[{Vis(2025)}]{Vis}
+Dave Vis. 2025.
+\newblock Official top 250 narrative feature films.
+\newblock
+  \url{https://letterboxd.com/dave/list/official-top-250-narrative-feature-films/}.
+\newblock Accessed: 2025-02-24.
+
+\bibitem[{Wang~Yuxin(2023)}]{MokaMassiveMixedEmbedding}
+He~sicheng Wang~Yuxin, Sun~Qingxuan. 2023.
+\newblock M3e: Moka massive mixed embedding model.
+
+\end{thebibliography}
