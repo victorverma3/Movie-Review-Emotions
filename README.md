@@ -2,8 +2,56 @@
 
 ## Table of Contents
 
--   [Project Directory](#project-directory)
 -   [Code Functionality](#code-functionality)
+-   [Project Directory](#project-directory)
+
+## Code Functionality
+
+### Data Preprocessing
+
+The following python files were used to scrape, preprocess, and expore the
+Letterboxd movie reviews dataset:
+
+-   `data_processing/emotions/explore_reviews.py`
+-   `data_processing/emotions/merge_reviews.py`
+-   `data_processing/emotions/process_reviews.py`
+-   `data_processing/emotions/scrape_reviews.py`
+
+The following python files were used to scrape, preprocess, and expore the
+emotions dataset:
+
+-   `data_processing/emotions/explore_emotions.py`
+-   `data_processing/emotions/process_emotions.py`
+-   `data_processing/emotions/split_emotions.py`
+-   `utils.py`
+
+### Baseline Evaluation
+
+The following python file was used to evaluate the performance of the baseline
+classification model:
+
+-   `data_processing/emotions/baseline_emotions.py`
+-   `utils.py`
+
+### Models
+
+The following python files were used to develop the custom classification model:
+
+-   `models/best_model.py`
+-   `models/best_params.py`
+-   `models/emotion_embeddings.py`
+-   `models/nn.py`
+-   `utils.py`
+
+### Emotion Patterns
+
+The following python files were used to find patterns in the emotions expressed
+in the movie reviews:
+
+-   `data_processing/scrape_movie_data.py`
+-   `output/inference.py`
+-   `output/visualization.py`
+-   `utils.py`
 
 ## Project Directory
 
@@ -158,51 +206,3 @@ README.md
 requirements.txt
 utils.py
 ```
-
-## Code Functionality
-
-### Data Preprocessing
-
-The following python files were used to scrape, preprocess, and expore the
-Letterboxd movie reviews dataset:
-
--   `data_processing/emotions/explore_reviews.py`
--   `data_processing/emotions/merge_reviews.py`
--   `data_processing/emotions/process_reviews.py`
--   `data_processing/emotions/scrape_reviews.py`
-
-The following python files were used to scrape, preprocess, and expore the
-emotions dataset:
-
--   `data_processing/emotions/explore_emotions.py`
--   `data_processing/emotions/process_emotions.py`
--   `data_processing/emotions/split_emotions.py`
--   `utils.py`
-
-### Baseline Evaluation
-
-The following python file was used to evaluate the performance of the baseline
-classification model:
-
--   `data_processing/emotions/baseline_emotions.py`
--   `utils.py`
-
-### Models
-
-The following python files were used to develop the custom classification model:
-
--   `models/best_model.py`
--   `models/best_params.py`
--   `models/emotion_embeddings.py`
--   `models/nn.py`
--   `utils.py`
-
-### Emotion Patterns
-
-The following python files were used to find patterns in the emotions expressed
-in the movie reviews:
-
--   `data_processing/scrape_movie_data.py`
--   `output/inference.py`
--   `output/visualization.py`
--   `utils.py`

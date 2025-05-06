@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.5)  2 MAY 2025 00:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.5)  3 MAY 2025 13:54
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -578,11 +578,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 89--109
 
  []
 
-
-LaTeX Warning: Hyper reference `tab:combinedl_emotion_label_distribution' on pa
-ge 2 undefined on input line 110.
-
-<images/baseline_emotion_confusion_matrix_combined.png, id=108, 578.16pt x 433.
+<images/baseline_emotion_confusion_matrix_combined.png, id=109, 578.16pt x 433.
 62pt>
 File: images/baseline_emotion_confusion_matrix_combined.png Graphic file (type 
 png)
@@ -627,7 +623,7 @@ Underfull \vbox (badness 1472) has occurred while \output is active []
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<images/eec_architecture.png, id=118, 376.40625pt x 472.76625pt>
+<images/eec_architecture.png, id=120, 376.40625pt x 472.76625pt>
 File: images/eec_architecture.png Graphic file (type png)
 <use images/eec_architecture.png>
 Package pdftex.def Info: images/eec_architecture.png  used on input line 166.
@@ -703,7 +699,7 @@ Underfull \hbox (badness 1755) in paragraph at lines 172--176
 \T1/ptm/m/n/10.95 (+20) a macro F1-score of 0.57 on the val-i-da-tion
  []
 
-<images/training_loss.png, id=137, 578.16pt x 433.62pt>
+<images/training_loss.png, id=139, 578.16pt x 433.62pt>
 File: images/training_loss.png Graphic file (type png)
 <use images/training_loss.png>
 Package pdftex.def Info: images/training_loss.png  used on input line 183.
@@ -758,7 +754,7 @@ Underfull \hbox (badness 1221) in paragraph at lines 177--188
 \T1/ptm/m/n/10.95 (+20) To fur-ther en-sure proper model train-ing, the
  []
 
-<images/validation_nn_emotion_confusion_matrix_combined.png, id=140, 578.16pt x
+<images/validation_nn_emotion_confusion_matrix_combined.png, id=142, 578.16pt x
  433.62pt>
 File: images/validation_nn_emotion_confusion_matrix_combined.png Graphic file (
 type png)
@@ -775,25 +771,25 @@ Underfull \hbox (badness 10000) in paragraph at lines 189--216
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [4 <./images/training_loss.png>]
-<images/emotion_counts_by_release_decade.png, id=154, 578.16pt x 433.62pt>
+<images/emotion_counts_by_release_decade.png, id=156, 578.16pt x 433.62pt>
 File: images/emotion_counts_by_release_decade.png Graphic file (type png)
 <use images/emotion_counts_by_release_decade.png>
 Package pdftex.def Info: images/emotion_counts_by_release_decade.png  used on i
 nput line 241.
 (pdftex.def)             Requested size: 204.85846pt x 153.64174pt.
-<images/emotion_counts_by_country.png, id=156, 578.16pt x 433.62pt>
+<images/emotion_counts_by_country.png, id=158, 578.16pt x 433.62pt>
 File: images/emotion_counts_by_country.png Graphic file (type png)
 <use images/emotion_counts_by_country.png>
 Package pdftex.def Info: images/emotion_counts_by_country.png  used on input li
 ne 249.
 (pdftex.def)             Requested size: 204.85846pt x 153.64174pt.
-<images/emotion_counts_by_genre.png, id=158, 722.7pt x 867.24pt>
+<images/emotion_counts_by_genre.png, id=160, 722.7pt x 867.24pt>
 File: images/emotion_counts_by_genre.png Graphic file (type png)
 <use images/emotion_counts_by_genre.png>
 Package pdftex.def Info: images/emotion_counts_by_genre.png  used on input line
  257.
 (pdftex.def)             Requested size: 204.85846pt x 245.82944pt.
-<images/average_likes_per_emotion.png, id=160, 578.16pt x 433.62pt>
+<images/average_likes_per_emotion.png, id=162, 578.16pt x 433.62pt>
 File: images/average_likes_per_emotion.png Graphic file (type png)
 <use images/average_likes_per_emotion.png>
 Package pdftex.def Info: images/average_likes_per_emotion.png  used on input li
@@ -971,18 +967,14 @@ Underfull \hbox (badness 1127) in paragraph at lines 66--71
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
-
-
-LaTeX Warning: There were undefined references.
-
 Package rerunfilecheck Info: File `paper.out' has not changed.
 (rerunfilecheck)             Checksum: 221E428EA490225F817C0BCED0F4C81F;1987.
  ) 
 Here is how much of TeX's memory you used:
- 14108 strings out of 474116
- 228948 string characters out of 5743683
+ 14107 strings out of 474116
+ 228906 string characters out of 5743683
  1951187 words of memory out of 5000000
- 36040 multiletter control sequences out of 15000+600000
+ 36039 multiletter control sequences out of 15000+600000
  593314 words of font info for 200 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  90i,10n,93p,1002b,454s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -990,10 +982,10 @@ Here is how much of TeX's memory you used:
 a-zi4r.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb
 ></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/loc
 al/texlive/2024/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (7 pages, 350447 bytes).
+Output written on paper.pdf (7 pages, 350501 bytes).
 PDF statistics:
- 244 PDF objects out of 1000 (max. 8388607)
- 208 compressed objects within 3 object streams
+ 246 PDF objects out of 1000 (max. 8388607)
+ 210 compressed objects within 3 object streams
  50 named destinations out of 1000 (max. 500000)
  36009 words of extra memory for PDF output out of 42996 (max. 10000000)
 
